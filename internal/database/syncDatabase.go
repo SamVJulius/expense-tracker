@@ -1,11 +1,11 @@
 package database
 
-import "expense-tracker/models"
+import "expense-tracker/internal/models"
 
 func SyncDatabase() {
 	DB.AutoMigrate(
 		&models.User{},
-		&models.Account{},
+		&models.Category{},
 		&models.Transaction{},
 	)
 }

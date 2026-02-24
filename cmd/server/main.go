@@ -1,7 +1,7 @@
 package main
 
 import (
-	"expense-tracker/database"
+	"expense-tracker/internal/database"
 
 	"github.com/gin-gonic/gin"
 )
