@@ -2,6 +2,7 @@ package main
 
 import (
 	"expense-tracker/internal/database"
+	"expense-tracker/internal/handler"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,6 +22,11 @@ func main() {
 		})
 	})
 
+	auth := router.Group("/auth")
+	{
+		auth.POST("/register", handler.Register)
+		auth.POST("/login", handler.Login)
+	}	
 
 	router.Run()
 }

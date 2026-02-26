@@ -12,10 +12,7 @@ func Create(user *models.User) error {
 func GetByEmail(email string) (*models.User, error) {
 	var user models.User
 	err := database.DB.Where("email = ?", email).First(&user).Error
-	if err != nil {
-		return nil, err
-	}
-	return &user, nil
+	return &user, err
 }
 
 func GetByID(id uint) (models.User, error) {

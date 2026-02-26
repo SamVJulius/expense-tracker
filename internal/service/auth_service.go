@@ -7,14 +7,12 @@ import (
 	"expense-tracker/pkg/jwt"
 
 	"golang.org/x/crypto/bcrypt"
+	"github.com/google/uuid"	
 )
 
 func Register(registerReq *dto.RegisterRequest) (string, error) {
 	user, err := repository.GetByEmail(registerReq.Email)
-	if err != nil {
-		return "failed to fetch user", err
-	}
-	if user != nil {
+	if err == nil && user.ID != "" {
 		return "user already exists", nil
 	}
 
@@ -23,7 +21,10 @@ func Register(registerReq *dto.RegisterRequest) (string, error) {
 		return "failed to hash password", err
 	}
 
+	id := "user-" + uuid.New().String()
+
 	newUser := &models.User{
+		ID:           id,
 		Name:         registerReq.Name,
 		Email:        registerReq.Email,
 		PasswordHash: string(hash),
