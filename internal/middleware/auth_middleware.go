@@ -1,35 +1,38 @@
 package middleware
 
 import (
-	"context"
 	"expense-tracker/pkg/jwt"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
-func AuthMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("Authorization")
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			http.Error(w, "missing authorization header", http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "missing authorization header"})
+			c.Abort()
 			return
 		}
 
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			http.Error(w, "invalid authorization header", http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid authorization header"})
+			c.Abort()
 			return
 		}
 
 		token := parts[1]
 		userID, err := jwt.ValidateToken(token)
 		if err != nil {
-			http.Error(w, "invalid token", http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			c.Abort()
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "userID", userID)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+		c.Set("userID", userID)
+		c.Next()
+	}
 }
-
